@@ -7,9 +7,11 @@ import { Link, useNavigate } from "react-router-dom";
 // import { Html5QrcodeScanner } from "html5-qrcode";
 import { QrReader } from "react-qr-reader";
 import { Result } from "@zxing/library";
+import { fetchUserJustifications } from "../../store/justificationsActions";
 
 const QRCodeScanner = () => {
     const rtos = useAppSelector((state) => state.rtos.rtos);
+    const currentUser = useAppSelector((state) => state.users.currentUser);
     const dispatch = useAppDispatch();
     const [currentDay, setCurrentDay] = useState<string>("");
     const [selected, setSelected] = useState("user");
@@ -42,7 +44,7 @@ const QRCodeScanner = () => {
 
     const getDate = (dateString: string) => {
         const [datePart, timePart] = dateString.split("T");
-        const [day, month, year] = datePart.split("-");
+        const [year, month, day] = datePart.split("-");
         const [hour, minute, second] = timePart.split(":");
         const formattedDateString = `${month}-${day}-${year} ${hour}:${minute}:${second}`;
         return new Date(formattedDateString);
@@ -59,16 +61,34 @@ const QRCodeScanner = () => {
     const getCurrentRTO = () => {
         if (currentDay.length > 0) {
             const currentRTO = rtos.filter((rto) => {
-                const rtoDate = getDate(rto.date);
+                const rtoDate = getDate(rto.dataRTO);
                 let lastChanceDate = new Date(rtoDate);
                 lastChanceDate.setHours(lastChanceDate.getHours() + 2);
+                console.log(currentDay);
                 const today = getDate(currentDay);
+                console.log(today, rtoDate);
                 if (checkDateBetween(rtoDate, today, lastChanceDate)) {
                     return true;
                 }
                 return false;
             });
-            return currentRTO[0];
+            if (currentRTO[0]) {
+                const categorieEstese = currentRTO[0].categorieEstese.map(
+                    (categoria) => categoria.replaceAll(" ", "")
+                );
+                console.log(currentRTO);
+                console.log(currentUser);
+                // Check if the RTO is for the user
+                if (
+                    currentRTO[0].codiciCategoria.includes(
+                        currentUser.codiceCategoria
+                    ) &&
+                    categorieEstese.includes(currentUser.categoriaEstesa)
+                ) {
+                    return currentRTO[0];
+                }
+            }
+            return null;
         }
         return null;
     };
@@ -81,16 +101,22 @@ const QRCodeScanner = () => {
             dispatch(fetchUsers());
             dispatch(getUser(localStorage.getItem("code")!));
             dispatch(fetchRTOs(localStorage.getItem("token")!));
+            dispatch(
+                fetchUserJustifications(
+                    localStorage.getItem("token")!,
+                    localStorage.getItem("code")!
+                )
+            );
             const today = new Date();
             const month = (today.getMonth() + 1).toString();
             const hour = today.getHours().toString();
             const minute = today.getMinutes().toString();
             const day =
-                today.getDate().toString().padStart(2, "0") +
+                today.getFullYear().toString() +
                 "-" +
                 month.padStart(2, "0") +
                 "-" +
-                today.getFullYear() +
+                today.getDate().toString().padStart(2, "0") +
                 "T" +
                 hour.padStart(2, "0") +
                 ":" +
@@ -125,15 +151,15 @@ const QRCodeScanner = () => {
                                 <h3 className="card-title h3">
                                     Benvenuto alla RTO del{" "}
                                     {getDate(
-                                        currentRTO.date
+                                        currentRTO.dataRTO
                                     ).toLocaleDateString()}{" "}
                                     ore{" "}
-                                    {getDate(currentRTO.date)
+                                    {getDate(currentRTO.dataRTO)
                                         .getHours()
                                         .toString()
                                         .padStart(2, "0")}
                                     :
-                                    {getDate(currentRTO.date)
+                                    {getDate(currentRTO.dataRTO)
                                         .getMinutes()
                                         .toString()
                                         .padStart(2, "0")}

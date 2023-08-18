@@ -1,7 +1,12 @@
 export type User = {
-    name: string;
-    surname: string;
-    mechanographicCode: string;
+    nome: string;
+    cognome: string;
+    codiceMeccanografico: string;
+    qualifica: string;
+    codiceCategoria: string;
+    categoriaEstesa: string;
+    email: string;
+    selezionabile: boolean;
 };
 
 export type UserInitialState = {
@@ -10,13 +15,25 @@ export type UserInitialState = {
 };
 
 export type RTO = {
-    date: string;
-    description: string;
-    users: User[];
+    dataRTO: string;
+    descrizione: string;
+    codiciCategoria: string[];
+    categorieEstese: string[];
     qrcode: string;
 };
 
 export type RTOInitialState = {
     currentRTO: RTO;
     rtos: RTO[];
+};
+
+export type RTORetrievedJustification = {
+    dataRTO: string;
+    statoUtente: string;
+    descrizioneGiustifica: string;
+    motivo: string;
+};
+
+export type JustificationsInitialState = {
+    justifications: RTORetrievedJustification[];
 };

@@ -60,7 +60,7 @@ const Login = () => {
                 );
                 const data = (await response.data) as User;
                 if (data !== null) {
-                    localStorage.setItem("code", data.mechanographicCode);
+                    localStorage.setItem("code", data.codiceMeccanografico);
                     navigate("/qrcode");
                 } else {
                     setIsValid(false);

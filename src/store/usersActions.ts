@@ -45,7 +45,8 @@ export const getUser = (
             localStorage.setItem("token", userResp["token"]);
             dispatch(
                 usersActions.getUser({
-                    mechanographicCode: userResp.mechanographicCode,
+                    mechanographicCode:
+                        userResp["codiceMeccanografico"].toString(),
                 })
             );
         } else {
@@ -62,50 +63,5 @@ export const resetUser = (): ThunkAction<
 > => {
     return (dispatch) => {
         dispatch(usersActions.resetUser({}));
-    };
-};
-
-// export const addUser = (
-//     user: User
-// ): ThunkAction<void, RootState, unknown, AnyAction> => {
-//     return async (dispatch) => {
-//         const addData = async () => {
-//             const response = await axios.post(HOST + `/users`, {
-//                 name: user.name,
-//                 surname: user.surname,
-//                 mechanographicCode: user.mechanographicCode,
-//             });
-//             const data = await response.data;
-//             console.log(data);
-//             return data as User;
-//         };
-
-//         const userResp = await addData();
-//         dispatch(
-//             usersActions.addUser({
-//                 user: userResp,
-//             })
-//         );
-//     };
-// };
-
-export const deleteUser = (
-    mechanographicCode: string
-): ThunkAction<void, RootState, unknown, AnyAction> => {
-    return async (dispatch) => {
-        const deleteData = async () => {
-            const response = await axios.get(
-                HOST + `/users/delete/${mechanographicCode}`
-            );
-            const data = await response.data;
-            console.log(data);
-            // return data;
-        };
-        await deleteData();
-        dispatch(
-            usersActions.removeUser({
-                mechanographicCode: mechanographicCode,
-            })
-        );
     };
 };
