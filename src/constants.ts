@@ -1,1 +1,1 @@
-export const HOST: string = "http://localhost:8000/aia";
+export const HOST: string = "http://localhost:5002";
